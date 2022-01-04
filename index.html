@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf8">
+        <style>
+            html {
+                background-color: #3B2C35;
+            }
+            svg {
+                height: 90vh;
+                width: auto;
+            }
+            .root {
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="root">
+            <svg version="1.1" viewbox="0 0 300 500" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="0" width="300" height="500" stroke="#2A1F2D" stroke-width="2px" fill="#3B2C35"></rect>
+                <circle r="50" fill="#56E39F">
+                    <animate attributeName="cx" values="49;251;49" dur="2.5s" repeatCount="indefinite"></animate>
+                    <animate attributeName="cy" values="49;451;49" dur="3s" repeatCount="indefinite"></animate>
+                </circle>
+            </svg>
+        </div>
+    </body>
+</html>
