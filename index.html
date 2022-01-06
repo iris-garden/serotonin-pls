@@ -1,31 +1,118 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf8">
-        <style>
-            html {
-                background-color: #3B2C35;
-            }
-            svg {
-                height: 90vh;
-                width: auto;
-            }
-            .root {
-                display: flex;
-                align-items: flex-start;
-                justify-content: center;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="root">
-            <svg version="1.1" viewbox="0 0 300 500" xmlns="http://www.w3.org/2000/svg">
-                <rect x="0" y="0" width="300" height="500" stroke="#2A1F2D" stroke-width="2px" fill="#3B2C35"></rect>
-                <circle r="50" fill="#56E39F">
-                    <animate attributeName="cx" values="49;251;49" dur="2.5s" repeatCount="indefinite"></animate>
-                    <animate attributeName="cy" values="49;451;49" dur="3s" repeatCount="indefinite"></animate>
-                </circle>
-            </svg>
-        </div>
-    </body>
+  <head>
+    <meta charset="utf8" />
+    <style>
+      html {
+        background-color: #3b2c35;
+      }
+      svg {
+        height: 90vh;
+        width: auto;
+      }
+      .root {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="root">
+      <svg
+        version="1.1"
+        viewbox="0 0 300 500"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect
+          x="0"
+          y="0"
+          width="300"
+          height="500"
+          stroke="#2A1F2D"
+          stroke-width="2px"
+          fill="#3B2C35"
+        ></rect>
+        <circle cx="35" cy="35" r="35" fill="#56E39F" id="player">
+          <animate
+            id="player-animation-x"
+            attributeType="XML"
+            attributeName="cx"
+            from="0"
+            to="0"
+            dur="0.2s"
+            fill="freeze"
+            begin="indefinite"
+          ></animate>
+          <animate
+            id="player-animation-y"
+            attributeType="XML"
+            attributeName="cy"
+            from="0"
+            to="0"
+            dur="0.2s"
+            fill="freeze"
+            begin="indefinite"
+          ></animate>
+        </circle>
+      </svg>
+    </div>
+    <script>
+      // utils
+      const mapToObject = (keys, func) =>
+        Object.fromEntries(keys.map((key) => [key, func(key)]));
+      const forEachObject = (obj, func) =>
+        Object.entries(obj).forEach(([key, val]) => func(key, val));
+      const setAttributeToString = (element, key, val) => {
+        element.setAttribute(key, `${val}`);
+      };
+      const callIfDefined = (func) => {
+        if (func !== undefined) {
+          func();
+        }
+      };
+      const callIfFound = (obj, funcName) => {
+        callIfDefined(obj[funcName]);
+      };
+
+      // player state
+      const player = {
+        element: document.getElementById("player"),
+        ...mapToObject(["x", "y"], (axis) => ({
+          lock: false,
+          element: document.getElementById(`player-animation-${axis}`),
+        })),
+      };
+      const getPlayerMove = (axis, direction) => () => {
+        const { lock, element: animateElement } = player[axis];
+        if (!lock) {
+          player[axis].lock = true;
+          const attr = `c${axis}`;
+          const start = parseInt(player.element.getAttribute(attr));
+          const end = start + direction * 10;
+          forEachObject({ from: start, to: end }, (key, val) => {
+            setAttributeToString(animateElement, key, val);
+          });
+          animateElement.addEventListener("endEvent", () => {
+            setAttributeToString(player.element, attr, end);
+            player[axis].lock = false;
+          });
+          animateElement.beginElement();
+        }
+      };
+
+      // input handling
+      const keyBinds = {
+        w: getPlayerMove("y", -1),
+        a: getPlayerMove("x", -1),
+        s: getPlayerMove("y", 1),
+        d: getPlayerMove("x", 1),
+      };
+      document.addEventListener("keydown", ({ key }) => {
+        callIfFound(keyBinds, key);
+      });
+
+      // TODO avoid OS keyrepeat setting by calling the keybind func in a while loop terminating on keyup
+    </script>
+  </body>
 </html>
