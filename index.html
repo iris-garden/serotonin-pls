@@ -66,13 +66,10 @@
       const setAttributeToString = (element, key, val) => {
         element.setAttribute(key, `${val}`);
       };
-      const callIfDefined = (func) => {
-        if (func !== undefined) {
-          func();
+      const doIfDefined = (val, callback) => {
+        if (val !== undefined) {
+          callback(val);
         }
-      };
-      const callIfFound = (obj, funcName) => {
-        callIfDefined(obj[funcName]);
       };
 
       // player state
@@ -103,16 +100,26 @@
 
       // input handling
       const keyBinds = {
-        w: getPlayerMove("y", -1),
-        a: getPlayerMove("x", -1),
-        s: getPlayerMove("y", 1),
-        d: getPlayerMove("x", 1),
+        w: { trigger: false, effect: getPlayerMove("y", -1) },
+        a: { trigger: false, effect: getPlayerMove("x", -1) },
+        s: { trigger: false, effect: getPlayerMove("y", 1) },
+        d: { trigger: false, effect: getPlayerMove("x", 1) },
       };
-      document.addEventListener("keydown", ({ key }) => {
-        callIfFound(keyBinds, key);
-      });
-
-      // TODO avoid OS keyrepeat setting by calling the keybind func in a while loop terminating on keyup
+      const keyListener =
+        (event) =>
+        ({ key }) => {
+          doIfDefined(keyBinds[key], (handler) => {
+            handler.trigger = event === "keydown";
+            setInterval(() => {
+              if (handler.trigger) {
+                handler.effect();
+              }
+            }, 10);
+          });
+        };
+      ["keydown", "keyup"].forEach((event) =>
+        document.addEventListener(event, keyListener(event))
+      );
     </script>
   </body>
 </html>
